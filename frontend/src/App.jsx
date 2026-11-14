@@ -1,9 +1,11 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import StudentDashboard from "./pages/StudentDashboard";
+import Profile from "./pages/Profile";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -38,19 +40,25 @@ export default function App() {
                 }
               />
 
-              {/* Placeholder for Upcoming Protected Routes */}
+              {/* Protected Student Routes */}
               <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <div className="max-w-4xl mx-auto py-16 px-4 text-center">
-                      <h2 className="text-2xl font-bold text-slate-800">Student Dashboard</h2>
-                      <p className="text-slate-500 mt-2">Connecting to student learning APIs in Milestone 4...</p>
-                    </div>
+                    <StudentDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
                   </ProtectedRoute>
                 }
               />
 
+              {/* Admin Protected Placeholder */}
               <Route
                 path="/admin/dashboard"
                 element={
