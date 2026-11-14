@@ -1,0 +1,21 @@
+# Node dependencies
+node_modules/
+*/node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+*/.env
+*/.env.*
+!*/.env.example
+
+# Build artifacts
+dist/
+*/dist/
+build/
+*/build/
+
+# Operating system files
+.DS_Store
+Thumbs.db

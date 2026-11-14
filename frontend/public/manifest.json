@@ -1,0 +1,18 @@
+{
+  "short_name": "GramShiksha",
+  "name": "GramShiksha – Rural E-Learning Platform",
+  "description": "Accessible, high-quality e-learning platform designed for rural students and communities.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["education"]
+}
