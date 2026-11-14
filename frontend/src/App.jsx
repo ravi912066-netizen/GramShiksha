@@ -4,6 +4,8 @@ import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ExploreCourses from "./pages/ExploreCourses";
+import CourseDetails from "./pages/CourseDetails";
 import StudentDashboard from "./pages/StudentDashboard";
 import Profile from "./pages/Profile";
 import { AuthProvider } from "./context/AuthContext";
@@ -21,6 +23,8 @@ export default function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
+              <Route path="/courses" element={<ExploreCourses />} />
+              <Route path="/courses/:id" element={<CourseDetails />} />
 
               {/* Public Only (Unauthenticated) Routes */}
               <Route
