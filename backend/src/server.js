@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
 const courseRoutes = require("./routes/course.routes");
+const lessonRoutes = require("./routes/lesson.routes");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/lessons", lessonRoutes);
 
 
 // Health check

@@ -8,6 +8,10 @@ const {
   updateCourse,
   deleteCourse,
 } = require("../controllers/course.controller");
+const {
+  createLesson,
+  getLessonsByCourse,
+} = require("../controllers/lesson.controller");
 const authenticate = require("../middleware/auth.middleware");
 const authorizeAdmin = require("../middleware/admin.middleware");
 
@@ -22,5 +26,9 @@ router.post("/", authenticate, authorizeAdmin, createCourse);
 router.put("/:id", authenticate, authorizeAdmin, updateCourse);
 router.patch("/:id", authenticate, authorizeAdmin, updateCourse);
 router.delete("/:id", authenticate, authorizeAdmin, deleteCourse);
+
+// Course lessons management
+router.post("/:courseId/lessons", authenticate, authorizeAdmin, createLesson);
+router.get("/:courseId/lessons", getLessonsByCourse);
 
 module.exports = router;
