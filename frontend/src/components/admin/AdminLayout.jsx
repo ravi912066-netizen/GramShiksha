@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
+import OfflineBanner from "../common/OfflineBanner";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
 
@@ -154,55 +155,58 @@ export default function AdminLayout({ children }) {
   );
 
   return (
-    <div className="min-h-screen flex bg-slate-100">
-      {/* Desktop Fixed Sidebar */}
-      <aside className="hidden md:block w-64 shrink-0 h-screen sticky top-0 shadow-md">
-        {sidebarContent}
-      </aside>
+    <div className="min-h-screen flex flex-col bg-slate-100">
+      <OfflineBanner />
+      <div className="flex-1 flex min-w-0">
+        {/* Desktop Fixed Sidebar */}
+        <aside className="hidden md:block w-64 shrink-0 h-screen sticky top-0 shadow-md">
+          {sidebarContent}
+        </aside>
 
-      {/* Mobile Drawer */}
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
-          <div
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="relative w-64 max-w-[80vw] h-full shadow-2xl z-10">
-            {sidebarContent}
+        {/* Mobile Drawer */}
+        {mobileOpen && (
+          <div className="md:hidden fixed inset-0 z-50 flex">
+            <div
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs"
+              onClick={() => setMobileOpen(false)}
+            />
+            <div className="relative w-64 max-w-[80vw] h-full shadow-2xl z-10">
+              {sidebarContent}
+            </div>
           </div>
+        )}
+
+        {/* Main Admin Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Top Navbar */}
+          <header className="bg-white border-b border-slate-200 h-16 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(true)}
+                className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+                aria-label="Open navigation sidebar"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h1 className="text-base sm:text-lg font-bold text-slate-900">
+                Platform Administration
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Badge variant="brand" size="sm">
+                <ShieldCheck className="w-3 h-3 text-brand-600" />
+                Admin Verified
+              </Badge>
+            </div>
+          </header>
+
+          {/* Dynamic Admin Body */}
+          <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
+            {children}
+          </main>
         </div>
-      )}
-
-      {/* Main Admin Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Navbar */}
-        <header className="bg-white border-b border-slate-200 h-16 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setMobileOpen(true)}
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
-              aria-label="Open navigation sidebar"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <h1 className="text-base sm:text-lg font-bold text-slate-900">
-              Platform Administration
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Badge variant="brand" size="sm">
-              <ShieldCheck className="w-3 h-3 text-brand-600" />
-              Admin Verified
-            </Badge>
-          </div>
-        </header>
-
-        {/* Dynamic Admin Body */}
-        <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
-          {children}
-        </main>
       </div>
     </div>
   );

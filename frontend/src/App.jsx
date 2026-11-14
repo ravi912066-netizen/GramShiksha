@@ -11,8 +11,11 @@ import StudentDashboard from "./pages/StudentDashboard";
 import MyLearning from "./pages/MyLearning";
 import LessonPage from "./pages/LessonPage";
 import Profile from "./pages/Profile";
+import OfflinePage from "./pages/OfflinePage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageCourses from "./pages/admin/ManageCourses";
+import ManageLessons from "./pages/admin/ManageLessons";
+import ManageStudents from "./pages/admin/ManageStudents";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -47,6 +50,14 @@ export default function App() {
               element={
                 <Layout>
                   <CourseDetails />
+                </Layout>
+              }
+            />
+            <Route
+              path="/offline"
+              element={
+                <Layout>
+                  <OfflinePage />
                 </Layout>
               }
             />
@@ -136,6 +147,26 @@ export default function App() {
                 <AdminRoute>
                   <AdminLayout>
                     <ManageCourses />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/lessons"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <ManageLessons />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/students"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <ManageStudents />
                   </AdminLayout>
                 </AdminRoute>
               }
