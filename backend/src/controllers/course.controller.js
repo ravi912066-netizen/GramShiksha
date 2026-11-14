@@ -176,8 +176,117 @@ const getCourseById = async (req, res) => {
   }
 };
 
+const updateCourse = async (req, res) => {
+  try {
+    const courseId = parseInt(req.params.id, 10);
+
+    if (isNaN(courseId) || courseId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid course ID. ID must be a positive integer.",
+      });
+    }
+
+    const { title, description, subject } = req.body;
+
+    if (!title && !description && !subject) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one field (title, description, or subject) is required to update",
+      });
+    }
+
+    const existingCourse = await prisma.course.findUnique({
+      where: { id: courseId },
+    });
+
+    if (!existingCourse) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    const dataToUpdate = {};
+    if (title !== undefined && title.trim() !== "") dataToUpdate.title = title.trim();
+    if (description !== undefined && description.trim() !== "") dataToUpdate.description = description.trim();
+    if (subject !== undefined && subject.trim() !== "") dataToUpdate.subject = subject.trim();
+
+    const updatedCourse = await prisma.course.update({
+      where: { id: courseId },
+      data: dataToUpdate,
+      include: {
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Course updated successfully",
+      course: updatedCourse,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const deleteCourse = async (req, res) => {
+  try {
+    const courseId = parseInt(req.params.id, 10);
+
+    if (isNaN(courseId) || courseId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid course ID. ID must be a positive integer.",
+      });
+    }
+
+    const existingCourse = await prisma.course.findUnique({
+      where: { id: courseId },
+    });
+
+    if (!existingCourse) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    // Related lessons and enrollments are deleted automatically via Prisma/PostgreSQL CASCADE
+    await prisma.course.delete({
+      where: { id: courseId },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Course and related records deleted successfully",
+      courseId,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   createCourse,
   getAllCourses,
   getCourseById,
+  updateCourse,
+  deleteCourse,
 };
