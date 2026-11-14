@@ -11,6 +11,8 @@ const {
 } = require("../controllers/progress.controller");
 const authenticate = require("../middleware/auth.middleware");
 const authorizeAdmin = require("../middleware/admin.middleware");
+const validate = require("../middleware/validate.middleware");
+const { progressSchema } = require("../validators/schemas");
 
 const router = express.Router();
 
@@ -19,7 +21,12 @@ router.get("/:id", authenticate, getLessonById);
 router.get("/:id/access", authenticate, getLessonById);
 
 // Student lesson progress tracking
-router.post("/:lessonId/progress", authenticate, updateLessonProgress);
+router.post(
+  "/:lessonId/progress",
+  authenticate,
+  validate(progressSchema),
+  updateLessonProgress
+);
 router.get("/:lessonId/progress", authenticate, getLessonProgress);
 
 // Admin-only routes for lesson management

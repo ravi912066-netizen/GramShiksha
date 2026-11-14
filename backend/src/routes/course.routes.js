@@ -19,6 +19,12 @@ const {
 } = require("../controllers/enrollment.controller");
 const authenticate = require("../middleware/auth.middleware");
 const authorizeAdmin = require("../middleware/admin.middleware");
+const validate = require("../middleware/validate.middleware");
+const {
+  courseCreateSchema,
+  courseUpdateSchema,
+  lessonCreateSchema,
+} = require("../validators/schemas");
 
 const router = express.Router();
 
@@ -27,13 +33,37 @@ router.get("/", getAllCourses);
 router.get("/:id", getCourseById);
 
 // Admin-only routes for course management
-router.post("/", authenticate, authorizeAdmin, createCourse);
-router.put("/:id", authenticate, authorizeAdmin, updateCourse);
-router.patch("/:id", authenticate, authorizeAdmin, updateCourse);
+router.post(
+  "/",
+  authenticate,
+  authorizeAdmin,
+  validate(courseCreateSchema),
+  createCourse
+);
+router.put(
+  "/:id",
+  authenticate,
+  authorizeAdmin,
+  validate(courseUpdateSchema),
+  updateCourse
+);
+router.patch(
+  "/:id",
+  authenticate,
+  authorizeAdmin,
+  validate(courseUpdateSchema),
+  updateCourse
+);
 router.delete("/:id", authenticate, authorizeAdmin, deleteCourse);
 
 // Course lessons management
-router.post("/:courseId/lessons", authenticate, authorizeAdmin, createLesson);
+router.post(
+  "/:courseId/lessons",
+  authenticate,
+  authorizeAdmin,
+  validate(lessonCreateSchema),
+  createLesson
+);
 router.get("/:courseId/lessons", getLessonsByCourse);
 router.get("/:courseId/lessons/access", authenticate, getProtectedCourseLessons);
 
