@@ -4,10 +4,14 @@ import { User, Mail, Lock, CheckCircle2, AlertCircle, ArrowRight, BookOpen } fro
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
+import useAuth from "../hooks/useAuth";
+import { useToast } from "../hooks/useToast";
 import { validateRegistration } from "../utils/validators";
 
-export default function Register({ onRegister, loading: propLoading, error: propError }) {
+export default function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -17,17 +21,13 @@ export default function Register({ onRegister, loading: propLoading, error: prop
   });
 
   const [errors, setErrors] = useState({});
-  const [internalLoading, setInternalLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-
-  const loading = propLoading || internalLoading;
-  const currentError = propError || serverError;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear validation error when typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -39,7 +39,6 @@ export default function Register({ onRegister, loading: propLoading, error: prop
     setServerError("");
     setSuccessMessage("");
 
-    // Validate form fields
     const { isValid, errors: validationErrors } = validateRegistration(formData);
     if (!isValid) {
       setErrors(validationErrors);
@@ -47,17 +46,17 @@ export default function Register({ onRegister, loading: propLoading, error: prop
     }
 
     try {
-      setInternalLoading(true);
+      setLoading(true);
+      await register({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      });
 
-      if (onRegister) {
-        await onRegister({
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          password: formData.password,
-        });
-      }
+      const successText = "Registration successful! You can now log in.";
+      setSuccessMessage(successText);
+      toast.success(successText);
 
-      setSuccessMessage("Account created successfully! Redirecting to login...");
       setTimeout(() => {
         navigate("/login");
       }, 1500);
@@ -67,8 +66,9 @@ export default function Register({ onRegister, loading: propLoading, error: prop
         err?.message ||
         "Registration failed. Please check your information and try again.";
       setServerError(msg);
+      toast.error(msg);
     } finally {
-      setInternalLoading(false);
+      setLoading(false);
     }
   };
 
@@ -90,15 +90,13 @@ export default function Register({ onRegister, loading: propLoading, error: prop
 
         {/* Card Form */}
         <Card className="shadow-card border-slate-200">
-          {/* Server Error Message */}
-          {currentError && (
+          {serverError && (
             <div className="mb-5 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-2.5">
               <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-              <span>{currentError}</span>
+              <span>{serverError}</span>
             </div>
           )}
 
-          {/* Success Message */}
           {successMessage && (
             <div className="mb-5 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-start gap-2.5">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
@@ -172,7 +170,6 @@ export default function Register({ onRegister, loading: propLoading, error: prop
             </div>
           </form>
 
-          {/* Footer note */}
           <div className="mt-6 text-center text-xs text-slate-500 border-t border-slate-100 pt-4">
             By registering, you gain free access as a student to all rural curriculum tracks.
           </div>

@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Mail, Lock, AlertCircle, ArrowRight, BookOpen, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, AlertCircle, ArrowRight, BookOpen } from "lucide-react";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import Card from "../components/common/Card";
+import useAuth from "../hooks/useAuth";
+import { useToast } from "../hooks/useToast";
 import { validateLogin } from "../utils/validators";
 
-export default function Login({ onLogin, loading: propLoading, error: propError }) {
+export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
+  const { toast } = useToast();
 
-  // Redirect destination if user was redirected from a protected route
   const from = location.state?.from?.pathname || "/dashboard";
 
   const [formData, setFormData] = useState({
@@ -19,11 +22,8 @@ export default function Login({ onLogin, loading: propLoading, error: propError 
   });
 
   const [errors, setErrors] = useState({});
-  const [internalLoading, setInternalLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
-
-  const loading = propLoading || internalLoading;
-  const currentError = propError || serverError;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,20 +45,18 @@ export default function Login({ onLogin, loading: propLoading, error: propError 
     }
 
     try {
-      setInternalLoading(true);
+      setLoading(true);
+      const user = await login({
+        email: formData.email.trim(),
+        password: formData.password,
+      });
 
-      if (onLogin) {
-        const user = await onLogin({
-          email: formData.email.trim(),
-          password: formData.password,
-        });
+      toast.success(`Welcome back, ${user.name}!`);
 
-        // Redirect based on role
-        if (user?.role === "ADMIN") {
-          navigate("/admin/dashboard", { replace: true });
-        } else {
-          navigate(from === "/login" ? "/dashboard" : from, { replace: true });
-        }
+      if (user.role === "ADMIN") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate(from === "/login" ? "/dashboard" : from, { replace: true });
       }
     } catch (err) {
       const msg =
@@ -66,8 +64,9 @@ export default function Login({ onLogin, loading: propLoading, error: propError 
         err?.message ||
         "Invalid email or password. Please try again.";
       setServerError(msg);
+      toast.error(msg);
     } finally {
-      setInternalLoading(false);
+      setLoading(false);
     }
   };
 
@@ -89,11 +88,10 @@ export default function Login({ onLogin, loading: propLoading, error: propError 
 
         {/* Card Form */}
         <Card className="shadow-card border-slate-200">
-          {/* Server Error Message */}
-          {currentError && (
+          {serverError && (
             <div className="mb-5 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-2.5">
               <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-              <span>{currentError}</span>
+              <span>{serverError}</span>
             </div>
           )}
 
@@ -138,9 +136,8 @@ export default function Login({ onLogin, loading: propLoading, error: propError 
             </div>
           </form>
 
-          {/* Educational tips */}
           <div className="mt-6 text-center text-xs text-slate-500 border-t border-slate-100 pt-4">
-            Free and secure access for both students and instructors.
+            Secure login for students and instructors.
           </div>
         </Card>
 
