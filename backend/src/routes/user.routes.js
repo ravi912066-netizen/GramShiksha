@@ -5,6 +5,7 @@ const {
   getUserProfile,
   getStudentDashboard,
 } = require("../controllers/user.controller");
+const { getUserOverallProgress } = require("../controllers/progress.controller");
 
 const router = express.Router();
 
@@ -16,5 +17,8 @@ router.get("/dashboard", authenticate, getStudentDashboard);
 
 // Student enrollments list
 router.get("/enrollments", authenticate, getUserEnrollments);
+
+// Student overall learning progress
+router.get("/progress", authenticate, getUserOverallProgress);
 
 module.exports = router;
