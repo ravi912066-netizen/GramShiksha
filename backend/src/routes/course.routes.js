@@ -11,6 +11,7 @@ const {
 const {
   createLesson,
   getLessonsByCourse,
+  getProtectedCourseLessons,
 } = require("../controllers/lesson.controller");
 const {
   enrollInCourse,
@@ -34,6 +35,7 @@ router.delete("/:id", authenticate, authorizeAdmin, deleteCourse);
 // Course lessons management
 router.post("/:courseId/lessons", authenticate, authorizeAdmin, createLesson);
 router.get("/:courseId/lessons", getLessonsByCourse);
+router.get("/:courseId/lessons/access", authenticate, getProtectedCourseLessons);
 
 // Student course enrollment
 router.post("/:courseId/enroll", authenticate, enrollInCourse);

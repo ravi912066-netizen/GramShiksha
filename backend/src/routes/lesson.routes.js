@@ -10,8 +10,9 @@ const authorizeAdmin = require("../middleware/admin.middleware");
 
 const router = express.Router();
 
-// Public route to view a lesson by ID
-router.get("/:id", getLessonById);
+// Protected route to view full lesson content (requires authentication + enrollment verification)
+router.get("/:id", authenticate, getLessonById);
+router.get("/:id/access", authenticate, getLessonById);
 
 // Admin-only routes for lesson management
 router.put("/:id", authenticate, authorizeAdmin, updateLesson);
