@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import ExploreCourses from "./pages/ExploreCourses";
 import CourseDetails from "./pages/CourseDetails";
 import StudentDashboard from "./pages/StudentDashboard";
+import MyLearning from "./pages/MyLearning";
 import Profile from "./pages/Profile";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
@@ -50,6 +51,14 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <StudentDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-learning"
+                element={
+                  <ProtectedRoute>
+                    <MyLearning />
                   </ProtectedRoute>
                 }
               />
