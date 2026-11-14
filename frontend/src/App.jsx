@@ -1,6 +1,7 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/layout/Layout";
+import AdminLayout from "./components/admin/AdminLayout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -10,6 +11,8 @@ import StudentDashboard from "./pages/StudentDashboard";
 import MyLearning from "./pages/MyLearning";
 import LessonPage from "./pages/LessonPage";
 import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ManageCourses from "./pages/admin/ManageCourses";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -21,90 +24,136 @@ export default function App() {
     <ToastProvider>
       <AuthProvider>
         <Router>
-          <Layout>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/courses" element={<ExploreCourses />} />
-              <Route path="/courses/:id" element={<CourseDetails />} />
+          <Routes>
+            {/* Public and Student Routes wrapped in standard Layout */}
+            <Route
+              path="/"
+              element={
+                <Layout>
+                  <Home />
+                </Layout>
+              }
+            />
+            <Route
+              path="/courses"
+              element={
+                <Layout>
+                  <ExploreCourses />
+                </Layout>
+              }
+            />
+            <Route
+              path="/courses/:id"
+              element={
+                <Layout>
+                  <CourseDetails />
+                </Layout>
+              }
+            />
 
-              {/* Public Only (Unauthenticated) Routes */}
-              <Route
-                path="/login"
-                element={
-                  <PublicOnlyRoute>
+            {/* Public Only (Unauthenticated) Routes */}
+            <Route
+              path="/login"
+              element={
+                <PublicOnlyRoute>
+                  <Layout>
                     <Login />
-                  </PublicOnlyRoute>
-                }
-              />
-              <Route
-                path="/register"
-                element={
-                  <PublicOnlyRoute>
+                  </Layout>
+                </PublicOnlyRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PublicOnlyRoute>
+                  <Layout>
                     <Register />
-                  </PublicOnlyRoute>
-                }
-              />
+                  </Layout>
+                </PublicOnlyRoute>
+              }
+            />
 
-              {/* Protected Student Routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
+            {/* Protected Student Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Layout>
                     <StudentDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/my-learning"
-                element={
-                  <ProtectedRoute>
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-learning"
+              element={
+                <ProtectedRoute>
+                  <Layout>
                     <MyLearning />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/courses/:courseId/learn"
-                element={
-                  <ProtectedRoute>
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/courses/:courseId/learn"
+              element={
+                <ProtectedRoute>
+                  <Layout>
                     <LessonPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Layout>
                     <Profile />
-                  </ProtectedRoute>
-                }
-              />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-              {/* Admin Protected Placeholder */}
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <AdminRoute>
-                    <div className="max-w-4xl mx-auto py-16 px-4 text-center">
-                      <h2 className="text-2xl font-bold text-slate-800">Admin Dashboard</h2>
-                      <p className="text-slate-500 mt-2">Connecting to admin APIs in Milestone 8...</p>
-                    </div>
-                  </AdminRoute>
-                }
-              />
+            {/* Admin Routes with Dedicated AdminLayout */}
+            <Route
+              path="/admin"
+              element={<Navigate to="/admin/dashboard" replace />}
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminDashboard />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/courses"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <ManageCourses />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
 
-              {/* 404 Catch-All */}
-              <Route
-                path="*"
-                element={
+            {/* 404 Catch-All */}
+            <Route
+              path="*"
+              element={
+                <Layout>
                   <div className="max-w-4xl mx-auto py-20 text-center px-4">
                     <h2 className="text-2xl font-bold text-slate-800">Page Not Found</h2>
                     <p className="text-slate-500 mt-2">The page you requested does not exist.</p>
                   </div>
-                }
-              />
-            </Routes>
-          </Layout>
+                </Layout>
+              }
+            />
+          </Routes>
         </Router>
       </AuthProvider>
     </ToastProvider>
