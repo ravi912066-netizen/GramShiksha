@@ -22,14 +22,18 @@ import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import EmptyState from "../components/common/EmptyState";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+import RecommendedCourses from "../components/dashboard/RecommendedCourses";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [dashboardData, setDashboardData] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [recLoading, setRecLoading] = useState(true);
   const [error, setError] = useState("");
+  const [recError, setRecError] = useState("");
 
   const fetchDashboard = async () => {
     try {
@@ -53,8 +57,31 @@ export default function StudentDashboard() {
     }
   };
 
+  const fetchRecommendations = async () => {
+    try {
+      setRecLoading(true);
+      setRecError("");
+      const res = await userService.getRecommendations();
+      if (res?.success && res?.data?.recommendations) {
+        setRecommendations(res.data.recommendations);
+      } else {
+        throw new Error(res?.message || "Failed to load recommendations");
+      }
+    } catch (err) {
+      console.error("Recommendations fetch error:", err);
+      setRecError(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Could not load recommendations"
+      );
+    } finally {
+      setRecLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchDashboard();
+    fetchRecommendations();
   }, []);
 
   if (loading) {
@@ -283,6 +310,16 @@ export default function StudentDashboard() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Recommended for You Section */}
+      <div className="space-y-4">
+        <RecommendedCourses
+          recommendations={recommendations}
+          loading={recLoading}
+          error={recError}
+          onRetry={fetchRecommendations}
+        />
       </div>
 
       {/* Quick Navigation and Educational Tips */}

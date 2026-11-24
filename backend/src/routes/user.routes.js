@@ -4,6 +4,7 @@ const { getUserEnrollments } = require("../controllers/enrollment.controller");
 const {
   getUserProfile,
   getStudentDashboard,
+  getRecommendations,
 } = require("../controllers/user.controller");
 const { getUserOverallProgress } = require("../controllers/progress.controller");
 
@@ -20,5 +21,8 @@ router.get("/enrollments", authenticate, getUserEnrollments);
 
 // Student overall learning progress
 router.get("/progress", authenticate, getUserOverallProgress);
+
+// Personalized course recommendations
+router.get("/recommendations", authenticate, getRecommendations);
 
 module.exports = router;

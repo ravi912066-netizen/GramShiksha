@@ -171,7 +171,176 @@ const getStudentDashboard = async (req, res) => {
   }
 };
 
+const getRecommendations = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // 1. Get student's enrollments with courses and lessons
+    const enrollments = await prisma.enrollment.findMany({
+      where: { userId },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            subject: true,
+            lessons: {
+              select: {
+                id: true,
+                title: true,
+              },
+              orderBy: { id: "asc" },
+            },
+          },
+        },
+      },
+    });
+
+    // 2. Get student's completed lesson progress
+    const completedProgress = await prisma.progress.findMany({
+      where: {
+        userId,
+        completed: true,
+      },
+      select: {
+        lessonId: true,
+      },
+    });
+
+    const completedLessonIdSet = new Set(completedProgress.map((p) => p.lessonId));
+
+    // 3. Build enrolled course IDs and preferred subjects
+    const enrolledCourseIds = new Set(enrollments.map((e) => e.course.id));
+    const preferredSubjects = new Set(
+      enrollments.map((e) => e.course.subject).filter(Boolean)
+    );
+
+    // 4. Find incomplete lessons from enrolled courses (CONTINUE_LESSON recommendations)
+    const continueLessonRecommendations = [];
+
+    for (const enrollment of enrollments) {
+      const course = enrollment.course;
+      for (const lesson of course.lessons) {
+        if (!completedLessonIdSet.has(lesson.id)) {
+          // Calculate course progress for this recommendation
+          const courseTotalLessons = course.lessons.length;
+          const courseCompletedLessons = course.lessons.filter((l) =>
+            completedLessonIdSet.has(l.id)
+          ).length;
+          const courseProgressPercentage =
+            courseTotalLessons > 0
+              ? Math.round((courseCompletedLessons / courseTotalLessons) * 100)
+              : 0;
+
+          continueLessonRecommendations.push({
+            type: "CONTINUE_LESSON",
+            courseId: course.id,
+            courseTitle: course.title,
+            lessonId: lesson.id,
+            lessonTitle: lesson.title,
+            subject: course.subject,
+            progress: courseProgressPercentage,
+            reason: "Continue your course",
+          });
+          break; // Only recommend the first incomplete lesson per course
+        }
+      }
+    }
+
+    // 5. If we already have 5+ recommendations from continue lessons, return them
+    if (continueLessonRecommendations.length >= 5) {
+      return res.status(200).json({
+        success: true,
+        message: "Personalized recommendations retrieved successfully",
+        data: {
+          recommendations: continueLessonRecommendations.slice(0, 5),
+        },
+      });
+    }
+
+    // 6. Find courses from preferred subjects that student hasn't enrolled in
+    const subjectBasedCourses = await prisma.course.findMany({
+      where: {
+        id: { notIn: Array.from(enrolledCourseIds) },
+        subject: { in: Array.from(preferredSubjects) },
+      },
+      select: {
+        id: true,
+        title: true,
+        subject: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5 - continueLessonRecommendations.length,
+    });
+
+    const subjectBasedRecommendations = subjectBasedCourses.map((course) => ({
+      type: "COURSE",
+      courseId: course.id,
+      courseTitle: course.title,
+      subject: course.subject,
+      progress: 0,
+      reason: "Based on your enrolled subject",
+    }));
+
+    // 7. If still not enough recommendations, fill with newest available courses
+    const allRecommendationsSoFar = [
+      ...continueLessonRecommendations,
+      ...subjectBasedRecommendations,
+    ];
+
+    if (allRecommendationsSoFar.length < 5) {
+      const recommendedCourseIds = new Set([
+        ...enrolledCourseIds,
+        ...subjectBasedCourses.map((c) => c.id),
+      ]);
+
+      const recentCourses = await prisma.course.findMany({
+        where: {
+          id: { notIn: Array.from(recommendedCourseIds) },
+        },
+        select: {
+          id: true,
+          title: true,
+          subject: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 5 - allRecommendationsSoFar.length,
+      });
+
+      const recentRecommendations = recentCourses.map((course) => ({
+        type: "COURSE",
+        courseId: course.id,
+        courseTitle: course.title,
+        subject: course.subject,
+        progress: 0,
+        reason: "Recently added course",
+      }));
+
+      allRecommendationsSoFar.push(...recentRecommendations);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Personalized recommendations retrieved successfully",
+      data: {
+        recommendations: allRecommendationsSoFar.slice(0, 5),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   getUserProfile,
   getStudentDashboard,
+  getRecommendations,
 };

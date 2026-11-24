@@ -7,6 +7,7 @@ import api from "./api";
  * - GET /api/users/profile
  * - GET /api/users/enrollments
  * - GET /api/users/progress
+ * - GET /api/users/recommendations
  */
 
 export const userService = {
@@ -31,6 +32,12 @@ export const userService = {
   // Get user's full progress breakdown across all courses
   getUserOverallProgress: async () => {
     const response = await api.get("/users/progress");
+    return response.data;
+  },
+
+  // Get personalized course recommendations
+  getRecommendations: async () => {
+    const response = await api.get("/users/recommendations");
     return response.data;
   },
 };
