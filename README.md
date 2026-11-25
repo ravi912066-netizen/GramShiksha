@@ -1,17 +1,38 @@
-# GramShiksha – Rural E-Learning Platform
+# GramShiksha – Rural E-Learning & Interactive XR Platform
 
 > **"Learn Without Limits, Grow Without Boundaries."**
 
-GramShiksha is a modern, responsive, and accessible e-learning web application designed specifically for students in rural communities. The platform bridges the digital education divide by providing lightweight, mobile-first, and offline-capable access to foundational courses, structured lessons (video lectures, study PDFs, and notes), and personalized progress tracking.
+**GramShiksha (ग्राम शिक्षा)** is an open, scalable, and resilient educational platform designed specifically for rural education and village learning. The platform bridges the digital education divide through a unified ecosystem:
+1. **Interactive Unity XR Client (`unity_client/`)**: Immersive Virtual Reality (VR) village tour, Augmented Reality (AR) tabletop lab, and 3D Interactive Model Inspector with multilingual voiceover support (English & Hindi).
+2. **Modern Web Application (`frontend/`)**: React.js, Vite, and Tailwind CSS PWA with offline caching, responsive course catalogs, and interactive student learning interfaces.
+3. **Robust Backend API (`backend/`)**: Node.js, Express, Prisma ORM, and PostgreSQL providing student enrollment, multimedia curriculum delivery, analytics, and authentication.
+
+---
+
+## 🥽 Unity VR / AR / 3D Client (`unity_client`)
+
+GramShiksha features a complete Unity XR educational application supporting:
+- **Virtual Reality (VR)**: Immersive village walkthrough with XR Origin, locomotion, teleportation, VR ray interactor popups, and an interactive Village Elder guide NPC.
+- **Augmented Reality (AR)**: Mobile camera AR placement (AR Foundation, ARCore, ARKit) with multi-touch gestures (drag, pinch-to-scale, rotate) and photo capture.
+- **3D Interactive Inspector**: 360° turntable, smooth orbit camera, sub-part highlighting, and bilingual educational explanations.
+- **Interactive Models**: Traditional Mud Houses, Primary Schools, Hand Pumps (India Mark II), Agricultural Tractors & Ploughs, Banyan Trees, and Water Resources.
+
+👉 **Full Unity project architecture, C# scripts, scene hierarchies, and build instructions are documented in [unity_client/README.md](unity_client/README.md).**
 
 ---
 
 ## 1. Project Architecture
 
-The repository maintains independent, modular sub-projects for the backend API and frontend client:
+The repository maintains independent, modular sub-projects for the backend API, web frontend, and Unity XR client:
 
 ```text
 GramShiksha/
+├── unity_client/                    # Unity VR, AR & 3D Interactive Client
+│   ├── Assets/Scripts/              # Core, VR, AR, 3DViewer, UI, and Data systems
+│   ├── Assets/Scenes/               # MainMenu, 3D Inspector, VR Tour, AR Lab
+│   ├── Packages/manifest.json       # URP, XR Interaction Toolkit, AR Foundation
+│   └── README.md                    # Dedicated Unity architecture and setup guide
+│
 ├── backend/                         # Node.js, Express, Prisma ORM, PostgreSQL backend
 │   ├── src/
 │   │   ├── controllers/             # Auth, Course, Lesson, Enrollment, Progress controllers
